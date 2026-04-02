@@ -2,8 +2,7 @@
 
 # Projeto de Automação de Testes - Playwright
 
-Este projeto contém testes automatizados desenvolvidos com **Playwright** para validar fluxos web, API e performance.
-
+Este projeto contém testes automatizados desenvolvidos com **Playwright** para validar fluxos web.
 ## Objetivo
 
 Automatizar cenários de teste para garantir mais qualidade, agilidade e confiabilidade nas validações do sistema.
