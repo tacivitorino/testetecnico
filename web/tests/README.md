@@ -82,14 +82,6 @@ Cenários implementados:
 deve permitir pesquisar artigos
 abrir artigo e rolar até o final da página
 
-#Testes de API
-Pasta: tests/api
-Estrutura reservada para cenários de validação de API com Playwright.
-
-#Testes de Performance
-Pasta: tests/performance
-Estrutura reservada para organização inicial de cenários de performance.
-
 ##Boas práticas aplicadas
 organização dos testes por tipo dentro da pasta tests
 separação entre testes web, API e performance

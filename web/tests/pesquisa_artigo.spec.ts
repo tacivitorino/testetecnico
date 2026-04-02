@@ -1,87 +1,46 @@
 
 import { test, expect } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'path';
 
-test('deve permitir pesquisar artigos', async ({ page }) => {
-  // Acessa o blog do Agibank
+dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env') });
+
+test('deve exibir erro ao informar e-mail inválido', async ({ page }) => {
   await page.goto('https://blog.agibank.com.br/');
 
-  // Espera a página ficar mais estável antes de interagir
-  await page.waitForLoadState('networkidle');
+  await page
+    .getByLabel('Primary Site Navigation')
+    .getByRole('link', { name: 'Seus benefícios' })
+    .click();
 
-  // Localiza a lupa no cabeçalho desktop
-  const lupa = page.locator('#ast-desktop-header a[aria-label="Search button"]').first();
+  const emailInput = page.getByRole('textbox', { name: 'Endereço de e-mail' });
 
-  // Clica na lupa
-  // O force foi usado porque esse elemento apresentou instabilidade na automação
-  await lupa.click({ force: true });
+  await emailInput.fill('teste@teste.com');
+  await page.getByRole('button', { name: 'Assinar' }).click();
 
-  // Localiza o campo de busca dentro do cabeçalho
-  const pesquisar = page.locator('#ast-desktop-header input.search-field').first();
+  await expect(page.getByText('Ocorreu um erro ao assinar.')).toBeVisible();
+});
 
-  // Preenche o campo de busca diretamente no DOM e envia o formulário
-  // Essa abordagem foi usada porque o campo visual da busca estava instável para automação
-  await pesquisar.evaluate((el, valor) => {
-    const input = el as HTMLInputElement;
+test('deve exibir mensagem para confirmar assinatura no e-mail', async ({ page }) => {
+  const email = process.env.NEWSLETTER_EMAIL;
 
-    // Define o valor digitado no campo
-    input.value = valor as string;
+  if (!email) {
+    throw new Error('A variável NEWSLETTER_EMAIL não foi carregada do arquivo .env');
+  }
 
-    // Dispara o evento de input para o site reconhecer a digitação
-    input.dispatchEvent(new Event('input', { bubbles: true }));
+  await page.goto('https://blog.agibank.com.br/');
 
-    // Dispara o evento de change para o site reconhecer a alteração do valor
-    input.dispatchEvent(new Event('change', { bubbles: true }));
+  await page
+    .getByLabel('Primary Site Navigation')
+    .getByRole('link', { name: 'Seus benefícios' })
+    .click();
 
-    // Envia o formulário da busca
-    input.form?.submit();
-  }, 'Empréstimo Pessoal');
+  const emailInput = page.getByRole('textbox', { name: 'Endereço de e-mail' });
 
-  // Valida que a URL contém o parâmetro de busca
-  await expect(page).toHaveURL(/[\?&]s=/);
+  await emailInput.fill(email);
+  await page.getByRole('button', { name: 'Assinar' }).click();
 
-  // Valida que a página de resultados foi exibida com o termo pesquisado
   await expect(
-    page.getByRole('heading', {
-      name: /Resultados encontrados para:\s*Empréstimo Pessoal/i,
-    })
+    page.getByText('Parece que você tentou fazer a assinatura com este e-mail')
   ).toBeVisible();
-
-  // Localiza o primeiro artigo listado no resultado da busca
-  const primeiroArtigo = page.locator('article h2 a, article h3 a').first();
-
-  // Rola a página até o primeiro artigo, caso ele esteja mais abaixo
-  await primeiroArtigo.scrollIntoViewIfNeeded();
-
-  // Valida que o artigo está visível antes do clique
-  await expect(primeiroArtigo).toBeVisible();
-
-  // Clica no primeiro artigo encontrado
-  await primeiroArtigo.click();
 });
-
-test('abrir artigo e rolar até o final', async ({ page }) => {
-  // Acessa o blog
-  await page.goto('https://blog.agibank.com.br/');
-
-  // Abre o menu
-  await page.getByRole('link', { name: 'O Agibank Alternar menu' }).click();
-
-  // Clica no artigo
-  await page.getByRole('link', {
-    name: 'Projetos sociais via leis de incentivo Agibank 2026: saiba como inscrever seu projeto',
-    exact: true
-  }).click();
-
-  // Aguarda a página carregar
-  await page.waitForLoadState('networkidle');
-
-  // Rola a página aos poucos até o final
-  await page.mouse.wheel(0, 1000);
-  await page.mouse.wheel(0, 1000);
-  await page.mouse.wheel(0, 1000);
-  await page.mouse.wheel(0, 1000);
-  await page.mouse.wheel(0, 1000);
-});
-
-
-
