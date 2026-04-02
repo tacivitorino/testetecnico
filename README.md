@@ -4,7 +4,7 @@ Projeto de teste técnico com **automação web**, **validação de APIs** e **t
 
 ## Repositório
 
-[https://github.com/tacivitorino/teste-tecnico-performance](https://github.com/tacivitorino/testetecnico)
+[https://github.com/tacivitorino/teste-tecnico-performance](https://github.com/tacivitorino/testetecnico) 
 
 ---
 
